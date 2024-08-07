@@ -1,38 +1,26 @@
 #[macro_export]
 macro_rules! c4 {
-    (for (;;) $code_block:block) => {
-        c4! { for (();true;()) $code_block }
+    (for (;;$($iter:stmt),*) $code_block:block) => {
+        c4! { for (();true;$($iter),*) $code_block }
     };
-    (for (;;$($iter:stmt),+) $code_block:block) => {
-        c4! { for (();true;$($iter),+) $code_block }
+    (for ($($init:stmt),+;;$($iter:stmt),*) $code_block:block) => {
+        c4! { for ($($init),+;true;$($iter),*) $code_block }
     };
-    (for (;$loop_condition:expr;) $code_block:block) => {
-        c4! { for (();$loop_condition;()) $code_block }
-    };
-    (for (;$loop_condition:expr;$($iter:stmt),+) $code_block:block) => {
-        c4! { for (();$loop_condition;$($iter),+) $code_block }
-    };
-    (for ($($init:stmt),+;;) $code_block:block) => {
-        c4! { for ($($init),+;true;()) $code_block }
-    };
-    (for ($($init:stmt),+;;$($iter:stmt),+) $code_block:block) => {
-        c4! { for ($($init),+;true;$($iter),+) $code_block }
-    };
-    (for ($($init:stmt),+;$loop_condition:expr;) $code_block:block) => {
-        c4! { for ($($init),+;$loop_condition;()) $code_block }
+    (for (;$loop_condition:expr;$($iter:stmt),*) $code_block:block) => {
+        c4! { for (();$loop_condition;$($iter),*) $code_block }
     };
     (
         for (
             $($init:stmt),+;
             $loop_condition:expr;
-            $($iter:stmt),+
+            $($iter:stmt),*
         ) $code_block:block
     ) => {
         {
             $($init)+
             while $loop_condition {
                 $code_block
-                $($iter)+
+                $($iter)*
             }
         }
     };
