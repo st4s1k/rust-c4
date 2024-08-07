@@ -17,11 +17,19 @@ macro_rules! c4 {
         ) $code_block:block
     ) => {
         {
+            let mut first_cycle = true;
             $($init)+
-            while $loop_condition {
+            loop {
+                if !first_cycle {
+                    $($iter)*
+                    if !$loop_condition {
+                        break;
+                    }
+                } else {
+                    first_cycle = false;
+                }
                 $code_block
-                $($iter)*
-            }
+            };
         }
     };
 }
@@ -243,6 +251,9 @@ mod tests {
 
         c4! {
             for (let mut i = 1; i <= 10; i += 1) {
+                if i == 5 {
+                    continue;
+                }
                 result.push_str(&format!("9 * {:<2} = {}{}", i, i - 1, 10 - i));
             }
         }
@@ -254,7 +265,7 @@ mod tests {
             "9 * 2  = 18",
             "9 * 3  = 27",
             "9 * 4  = 36",
-            "9 * 5  = 45",
+            // "9 * 5  = 45",
             "9 * 6  = 54",
             "9 * 7  = 63",
             "9 * 8  = 72",
